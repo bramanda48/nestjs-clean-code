@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConsoleLogger } from '@nestjs/common/services';
 import * as Rollbar from 'rollbar';
 import { ILogger } from '../../domain/common/logger.interface';
+import { Env } from '../../domain/config/environment.interface';
 import { EnvService } from '../config/environment/environment.service';
 
 @Injectable()
@@ -20,7 +21,7 @@ export class LoggerService extends ConsoleLogger implements ILogger {
     }
 
     debug(context: string, message: string) {
-        if (process.env.NODE_ENV !== 'production') {
+        if (!this.envSevice.isEnv(Env.production)) {
             super.debug(message, context);
             if (this.rollbar) {
                 this.rollbar.debug(message, context);
@@ -50,7 +51,7 @@ export class LoggerService extends ConsoleLogger implements ILogger {
     }
 
     verbose(context: string, message: string) {
-        if (process.env.NODE_ENV !== 'production') {
+        if (!this.envSevice.isEnv(Env.production)) {
             super.verbose(message, context);
         }
     }
