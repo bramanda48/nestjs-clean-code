@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConsoleLogger } from '@nestjs/common/services';
+import { isEmpty } from 'lodash';
 import * as Rollbar from 'rollbar';
 import { ILogger } from '../../domain/common/logger.interface';
 import { Env } from '../../domain/config/environment.interface';
@@ -12,12 +13,15 @@ export class LoggerService extends ConsoleLogger implements ILogger {
         private readonly envSevice: EnvService,
     ) {
         super();
-        this.rollbar = new Rollbar({
-            accessToken: this.envSevice.getRollbarAccessToken(),
-            captureUncaught: true,
-            captureUnhandledRejections: true,
-            environment: this.envSevice.name(),
-        });
+        const rollbarAccessToken = this.envSevice.getRollbarAccessToken();
+        if (!isEmpty(rollbarAccessToken)) {
+            this.rollbar = new Rollbar({
+                accessToken: rollbarAccessToken,
+                captureUncaught: true,
+                captureUnhandledRejections: true,
+                environment: this.envSevice.name(),
+            });
+        }
     }
 
     debug(context: string, message: string) {

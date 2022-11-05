@@ -20,7 +20,7 @@ export class EnvService
     }
 
     getRollbarAccessToken(): string {
-        return this.configService.get<string>('ROLLBAR_ACCESS_TOKEN');
+        return this.configService.get<string>('ROLLBAR_ACCESS_TOKEN') ?? null;
     }
 
     getDatabaseHost(): string {

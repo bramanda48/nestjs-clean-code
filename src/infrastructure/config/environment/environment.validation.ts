@@ -34,6 +34,7 @@ export class EnvValidation {
     @IsBoolean()
     DATABASE_SYNCHRONIZE: boolean;
 
+    @IsOptional()
     @IsString()
     ROLLBAR_ACCESS_TOKEN: string;
 }
