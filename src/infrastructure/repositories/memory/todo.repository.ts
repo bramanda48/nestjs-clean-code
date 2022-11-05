@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 } from 'uuid';
-import { IRepository } from '../../../domain/common/repository.interface';
 import { TodoModel } from '../../../domain/model/todo.model';
+import { GeneralRepository } from '../../../domain/repositories/general-repository.interface';
 
 @Injectable()
-export class TodoRepositoryMemory extends IRepository<TodoModel> {
+export class TodoRepositoryMemory extends GeneralRepository<TodoModel> {
     private temporaryData: TodoModel[] = [];
     constructor() {
         super();

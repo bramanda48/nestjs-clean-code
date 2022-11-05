@@ -3,12 +3,12 @@ import { NotFoundException } from '@nestjs/common/exceptions';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { IMapper } from '../../../domain/common/mapper.interface';
-import { IRepository } from '../../../domain/common/repository.interface';
 import { TodoModel } from '../../../domain/model/todo.model';
+import { GeneralRepository } from '../../../domain/repositories/general-repository.interface';
 import { TodoEntity } from '../../entities/todo.entity';
 
 @Injectable()
-export class TodoRepository extends IRepository<TodoModel>
+export class TodoRepository extends GeneralRepository<TodoModel>
     implements IMapper<TodoEntity, TodoModel> {
     constructor(
         @InjectRepository(TodoEntity)
