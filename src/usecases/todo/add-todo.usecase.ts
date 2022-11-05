@@ -8,12 +8,13 @@ import { TodoRepository } from '../../infrastructure/repositories/typeorm/todo.r
 export class AddTodoUseCase implements UseCase<TodoModel> {
     constructor(
         @Inject(TodoRepository)
-        private readonly todoRepository: GeneralRepository<TodoModel>
-    ) { }
+        private readonly todoRepository: GeneralRepository<TodoModel>,
+    ) {}
 
     async execute(title: string, content: string): Promise<TodoModel> {
         const result = this.todoRepository.create({
-            title, content
+            title,
+            content,
         });
         return result;
     }

@@ -9,9 +9,7 @@ import { EnvService } from '../config/environment/environment.service';
 @Injectable()
 export class LoggerService extends ConsoleLogger implements ILogger {
     private rollbar: Rollbar;
-    constructor(
-        private readonly envSevice: EnvService,
-    ) {
+    constructor(private readonly envSevice: EnvService) {
         super();
         const rollbarAccessToken = this.envSevice.getRollbarAccessToken();
         if (!isEmpty(rollbarAccessToken)) {

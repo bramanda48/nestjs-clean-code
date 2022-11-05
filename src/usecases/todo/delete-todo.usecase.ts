@@ -8,11 +8,11 @@ import { TodoRepository } from '../../infrastructure/repositories/typeorm/todo.r
 export class DeleteTodoUseCase implements UseCase<TodoModelDeleted> {
     constructor(
         @Inject(TodoRepository)
-        private readonly todoRepository: GeneralRepository<TodoModel>
-    ) { }
+        private readonly todoRepository: GeneralRepository<TodoModel>,
+    ) {}
 
     async execute(id: string): Promise<TodoModelDeleted> {
         this.todoRepository.delete(id);
-        return { 'deleted': true };
+        return { deleted: true };
     }
 }

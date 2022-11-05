@@ -11,13 +11,13 @@ import { validate } from './environment.validation';
             isGlobal: true,
             envFilePath: [
                 `./.env`,
-                `./env/${process.env?.NODE_ENV ?? 'development'}.env`
+                `./env/${process.env?.NODE_ENV ?? 'development'}.env`,
             ],
-            validate: validate
+            validate: validate,
         }),
     ],
     controllers: [],
     providers: [EnvService],
     exports: [EnvService],
 })
-export class EnvModule { }
+export class EnvModule {}

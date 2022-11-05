@@ -3,7 +3,7 @@ export enum Env {
     development = 0,
     staging = 1,
     hotfix = 2,
-    production = 3
+    production = 3,
 }
 
 export enum EnvString {
@@ -11,7 +11,7 @@ export enum EnvString {
     development = 'development',
     staging = 'staging',
     hotfix = 'hotfix',
-    production = 'production'
+    production = 'production',
 }
 
 export interface IEnvConfig {

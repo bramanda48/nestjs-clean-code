@@ -5,4 +5,4 @@ import { TodoController } from './todo.controller';
     controllers: [TodoController],
     providers: [],
 })
-export class TodoModule { };
+export class TodoModule {}

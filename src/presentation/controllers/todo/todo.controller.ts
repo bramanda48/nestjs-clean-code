@@ -7,9 +7,7 @@ import { CreateTodoDto, DeleteTodoDto, GetTodoDto } from './todo.dto';
 @ApiTags('Todo')
 @Controller('todo')
 export class TodoController {
-    constructor(
-        private readonly useCase: UseCaseProxyService,
-    ) { }
+    constructor(private readonly useCase: UseCaseProxyService) {}
 
     @Get('/')
     async getTodos() {

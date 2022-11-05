@@ -13,13 +13,7 @@ import { TodoRepository } from './typeorm/todo.repository';
         TypeOrmModule.forFeature([TodoEntity]),
     ],
     controllers: [],
-    providers: [
-        TodoRepository,
-        TodoRepositoryMemory
-    ],
-    exports: [
-        TodoRepository,
-        TodoRepositoryMemory
-    ],
+    providers: [TodoRepository, TodoRepositoryMemory],
+    exports: [TodoRepository, TodoRepositoryMemory],
 })
-export class RepoModule { }
+export class RepoModule {}

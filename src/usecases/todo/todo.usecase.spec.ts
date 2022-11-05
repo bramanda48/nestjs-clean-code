@@ -8,7 +8,7 @@ import { GetTodosUseCase } from './get-todos.usecase';
 
 describe('Todo (unit testing)', () => {
     let app: INestApplication;
-    let memoryRepo: TodoRepositoryMemory = new TodoRepositoryMemory();
+    const memoryRepo: TodoRepositoryMemory = new TodoRepositoryMemory();
     let addTodoUseCase: AddTodoUseCase;
     let deleteTodoUseCase: DeleteTodoUseCase;
     let getTodoUseCase: GetTodoUseCase;
@@ -19,19 +19,19 @@ describe('Todo (unit testing)', () => {
             providers: [
                 {
                     provide: AddTodoUseCase,
-                    useFactory: () => new AddTodoUseCase(memoryRepo)
+                    useFactory: () => new AddTodoUseCase(memoryRepo),
                 },
                 {
                     provide: DeleteTodoUseCase,
-                    useFactory: () => new DeleteTodoUseCase(memoryRepo)
+                    useFactory: () => new DeleteTodoUseCase(memoryRepo),
                 },
                 {
                     provide: GetTodoUseCase,
-                    useFactory: () => new GetTodoUseCase(memoryRepo)
+                    useFactory: () => new GetTodoUseCase(memoryRepo),
                 },
                 {
                     provide: GetTodosUseCase,
-                    useFactory: () => new GetTodosUseCase(memoryRepo)
+                    useFactory: () => new GetTodosUseCase(memoryRepo),
                 },
             ],
         }).compile();
@@ -54,7 +54,10 @@ describe('Todo (unit testing)', () => {
     });
 
     it('should create new todo', async () => {
-        const createOne = await addTodoUseCase.execute('Title Todo', 'Content Todo');
+        const createOne = await addTodoUseCase.execute(
+            'Title Todo',
+            'Content Todo',
+        );
         const getOne = await getTodoUseCase.execute(createOne.id);
         expect(createOne).toBe(getOne);
     });

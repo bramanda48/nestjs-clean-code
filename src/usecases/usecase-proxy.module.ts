@@ -15,8 +15,6 @@ import { UseCaseProxyService } from './usecase-proxy.service';
         GetTodoUseCase,
         GetTodosUseCase,
     ],
-    exports: [
-        UseCaseProxyService,
-    ]
+    exports: [UseCaseProxyService],
 })
-export class UseCaseProxyModule { }
+export class UseCaseProxyModule {}

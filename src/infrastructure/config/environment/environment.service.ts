@@ -5,11 +5,8 @@ import { Env, IEnvConfig } from '../../../domain/config/environment.interface';
 import { IRollbarConfig } from '../../../domain/config/rollbar.interface';
 
 @Injectable()
-export class EnvService
-    implements IEnvConfig, IDatabaseConfig, IRollbarConfig {
-    constructor(
-        private readonly configService: ConfigService
-    ) { }
+export class EnvService implements IEnvConfig, IDatabaseConfig, IRollbarConfig {
+    constructor(private readonly configService: ConfigService) {}
 
     getServeUrl(): string {
         return this.configService.get<string>('SERVE_URL');

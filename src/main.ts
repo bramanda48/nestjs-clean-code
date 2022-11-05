@@ -1,4 +1,9 @@
-import { ClassSerializerInterceptor, INestApplication, ValidationPipe, VersioningType } from '@nestjs/common';
+import {
+    ClassSerializerInterceptor,
+    INestApplication,
+    ValidationPipe,
+    VersioningType,
+} from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
@@ -18,7 +23,7 @@ async function bootstrap() {
     const servePort = envService.getServePort();
 
     // set logger
-    app.useLogger(loggerService)
+    app.useLogger(loggerService);
 
     // set global prefix
     app.setGlobalPrefix('api', {
@@ -34,7 +39,7 @@ async function bootstrap() {
     // pipes
     app.useGlobalPipes(new ValidationPipe());
     app.useGlobalInterceptors(
-        new ClassSerializerInterceptor(app.get(Reflector))
+        new ClassSerializerInterceptor(app.get(Reflector)),
     );
 
     // interceptors
@@ -51,8 +56,14 @@ async function bootstrap() {
         setupSwaggerDocs(app);
     }
 
-    loggerService.log('NestFactory', `Application is running in "${envService.name()}" mode`);
-    loggerService.log('NestFactory', `Application listening on port ${servePort}`);
+    loggerService.log(
+        'NestFactory',
+        `Application is running in "${envService.name()}" mode`,
+    );
+    loggerService.log(
+        'NestFactory',
+        `Application listening on port ${servePort}`,
+    );
     await app.listen(servePort);
 }
 
@@ -60,13 +71,17 @@ async function setupSwaggerDocs(app: INestApplication) {
     const document = new DocumentBuilder()
         .setTitle('Nestjs Clean Architecture')
         .setVersion('1.0')
-        .setContact('John Doe', 'http://www.example.com', 'example@mailinator.com')
+        .setContact(
+            'John Doe',
+            'http://www.example.com',
+            'example@mailinator.com',
+        )
         .setDescription(
             `<p>Documentation for the Nestjs Clean Architecture <p/>` +
-            `<p>Official website: <a target="_blank" href="https://example.com">https://example.com</a><br/>` +
-            `Additional documentation: <a target="_blank" href="https://docs.example.com">https://docs.example.com</a> <br/>` +
-            `Source code: <a target="_blank" href="hhttps://github.com/bramanda48/nestjs-clean-code">https://github.com/bramanda48/nestjs-boilerplate</a></p>`,
-        )
+                `<p>Official website: <a target="_blank" href="https://example.com">https://example.com</a><br/>` +
+                `Additional documentation: <a target="_blank" href="https://docs.example.com">https://docs.example.com</a> <br/>` +
+                `Source code: <a target="_blank" href="hhttps://github.com/bramanda48/nestjs-clean-code">https://github.com/bramanda48/nestjs-boilerplate</a></p>`,
+        );
 
     const swagger = SwaggerModule.createDocument(app, document.build());
     SwaggerModule.setup('/docs', app, swagger);

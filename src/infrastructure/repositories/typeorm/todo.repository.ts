@@ -8,11 +8,13 @@ import { GeneralRepository } from '../../../domain/repositories/general-reposito
 import { TodoEntity } from '../../entities/todo.entity';
 
 @Injectable()
-export class TodoRepository extends GeneralRepository<TodoModel>
-    implements IMapper<TodoEntity, TodoModel> {
+export class TodoRepository
+    extends GeneralRepository<TodoModel>
+    implements IMapper<TodoEntity, TodoModel>
+{
     constructor(
         @InjectRepository(TodoEntity)
-        private readonly repo: Repository<TodoEntity>
+        private readonly repo: Repository<TodoEntity>,
     ) {
         super();
     }
@@ -42,7 +44,7 @@ export class TodoRepository extends GeneralRepository<TodoModel>
 
     async getAll(): Promise<TodoModel[]> {
         const getAllData = await this.repo.find();
-        return getAllData.map(x => this.toModel(x));
+        return getAllData.map((x) => this.toModel(x));
     }
 
     async getOne(filter: Partial<TodoModel>): Promise<TodoModel> {

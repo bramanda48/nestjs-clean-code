@@ -1,4 +1,7 @@
-import { TypeOrmModuleAsyncOptions, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import {
+    TypeOrmModuleAsyncOptions,
+    TypeOrmModuleOptions,
+} from '@nestjs/typeorm';
 import { EnvModule } from '../environment/environment.module';
 import { EnvService } from '../environment/environment.service';
 
@@ -14,15 +17,16 @@ export default class TypeOrmConfig {
             synchronize: envService.getDatabaseSync(),
             migrationsRun: false,
             autoLoadEntities: true,
-        }
+        };
     }
 }
 
 export const typeOrmConfigAsync: TypeOrmModuleAsyncOptions = {
     imports: [EnvModule],
-    useFactory: async (envService: EnvService):
-        Promise<TypeOrmModuleOptions> => {
+    useFactory: async (
+        envService: EnvService,
+    ): Promise<TypeOrmModuleOptions> => {
         return TypeOrmConfig.getConfig(envService);
     },
-    inject: [EnvService]
-}  
+    inject: [EnvService],
+};

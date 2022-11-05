@@ -1,5 +1,11 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, UpdateDateColumn } from "typeorm";
-import { BaseEntity } from "./base.entity";
+import {
+    Column,
+    CreateDateColumn,
+    DeleteDateColumn,
+    Entity,
+    UpdateDateColumn,
+} from 'typeorm';
+import { BaseEntity } from './base.entity';
 
 @Entity({ name: 'todo' })
 export class TodoEntity extends BaseEntity {

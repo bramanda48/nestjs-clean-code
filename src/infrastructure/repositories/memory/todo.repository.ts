@@ -18,15 +18,15 @@ export class TodoRepositoryMemory extends GeneralRepository<TodoModel> {
     }
 
     async update(id: string, data: TodoModel): Promise<TodoModel> {
-        let getOneData = this.temporaryData.find(x => x.id === id);
-        let indexNumber = this.temporaryData.indexOf(getOneData);
+        let getOneData = this.temporaryData.find((x) => x.id === id);
+        const indexNumber = this.temporaryData.indexOf(getOneData);
         getOneData = { ...getOneData, ...data };
         this.temporaryData[indexNumber] = getOneData;
         return getOneData;
     }
 
     async getById(id: string): Promise<TodoModel> {
-        const getOneData = this.temporaryData.find(x => x.id === id);
+        const getOneData = this.temporaryData.find((x) => x.id === id);
         if (!getOneData) throw new NotFoundException(`Todo doesn't exist`);
         return getOneData;
     }
@@ -36,11 +36,15 @@ export class TodoRepositoryMemory extends GeneralRepository<TodoModel> {
     }
 
     async getOne(filter: Partial<TodoModel>): Promise<TodoModel> {
-        return null;
+        const filterKeys = Object.keys(filter);
+        const getFilteredData = this.temporaryData.find((x) => {
+            return filterKeys.every(key => filter[key] == x[key]);
+        });
+        return getFilteredData;
     }
 
     async delete(id: string): Promise<void> {
-        const findData = this.temporaryData.filter(x => x.id != id);
+        const findData = this.temporaryData.filter((x) => x.id != id);
         this.temporaryData = findData;
     }
 }

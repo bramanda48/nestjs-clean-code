@@ -8,8 +8,8 @@ import { TodoRepository } from '../../infrastructure/repositories/typeorm/todo.r
 export class GetTodosUseCase implements UseCase<TodoModel[]> {
     constructor(
         @Inject(TodoRepository)
-        private readonly todoRepository: GeneralRepository<TodoModel>
-    ) { }
+        private readonly todoRepository: GeneralRepository<TodoModel>,
+    ) {}
 
     async execute(): Promise<TodoModel[]> {
         const result = this.todoRepository.getAll();

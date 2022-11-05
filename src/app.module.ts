@@ -12,9 +12,9 @@ import { UseCaseProxyModule } from './usecases/usecase-proxy.module';
         RepoModule,
         LoggerModule,
         UseCaseProxyModule,
-        TodoModule
+        TodoModule,
     ],
     controllers: [AppController],
     providers: [],
 })
-export class AppModule { }
+export class AppModule {}

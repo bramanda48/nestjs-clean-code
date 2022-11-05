@@ -1,12 +1,15 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsUUID } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsUUID } from 'class-validator';
 
 export class CreateTodoDto {
     @ApiProperty({ example: 'title todo' })
     @IsString()
     title: string;
 
-    @ApiProperty({ example: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry' })
+    @ApiProperty({
+        example:
+            'Lorem Ipsum is simply dummy text of the printing and typesetting industry',
+    })
     @IsString()
     content: string;
 }

@@ -4,13 +4,11 @@ import { ApiTags } from '@nestjs/swagger/dist/decorators';
 @ApiTags('Default')
 @Controller()
 export class AppController {
-    constructor() { }
-
     @Get('/')
     @Version(VERSION_NEUTRAL)
     welcome() {
         return {
-            "appVersion": process.env.npm_package_version
+            appVersion: process.env.npm_package_version,
         };
     }
 }
