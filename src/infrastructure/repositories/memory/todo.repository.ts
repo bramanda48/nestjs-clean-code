@@ -38,7 +38,7 @@ export class TodoRepositoryMemory extends GeneralRepository<TodoModel> {
     async getOne(filter: Partial<TodoModel>): Promise<TodoModel> {
         const filterKeys = Object.keys(filter);
         const getFilteredData = this.temporaryData.find((x) => {
-            return filterKeys.every(key => filter[key] == x[key]);
+            return filterKeys.every((key) => filter[key] == x[key]);
         });
         return getFilteredData;
     }
