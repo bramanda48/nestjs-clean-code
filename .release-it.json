@@ -1,0 +1,65 @@
+{
+    "git": {
+        "commitMessage": "build: release v${version}"
+    },
+    "github": {
+        "release": true,
+        "releaseName": "Release ${version}",
+        "autoGenerate": true,
+        "tokenRef": "GITHUB_TOKEN"
+    },
+    "plugins": {
+        "@release-it/conventional-changelog": {
+            "infile": "CHANGELOG.md",
+            "preset": {
+                "name": "conventionalcommits",
+                "types": [
+                    {
+                        "type": "feat",
+                        "section": "Features"
+                    },
+                    {
+                        "type": "fix",
+                        "section": "Bug Fixes"
+                    },
+                    {
+                        "type": "chore",
+                        "hidden": true
+                    },
+                    {
+                        "type": "docs",
+                        "section": "Documentation"
+                    },
+                    {
+                        "type": "style",
+                        "hidden": true
+                    },
+                    {
+                        "type": "refactor",
+                        "section": "Bug Fixes"
+                    },
+                    {
+                        "type": "perf",
+                        "section": "Improvement"
+                    },
+                    {
+                        "type": "test",
+                        "hidden": true
+                    },
+                    {
+                        "type": "ci",
+                        "section": "Build System or Dependencies"
+                    },
+                    {
+                        "type": "build",
+                        "section": "Build System or Dependencies"
+                    },
+                    {
+                        "type": "revert",
+                        "section": "Revert Commit"
+                    }
+                ]
+            }
+        }
+    }
+}

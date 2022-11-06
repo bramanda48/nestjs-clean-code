@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+echo -e "\nIf error, use command 'npm run git:commit' or 'yarn git:commit' to help create a standard commit message using Conventional Commits specification (https://www.conventionalcommits.org/en/v1.0.0/).";
 npx --no -- commitlint --edit $1
