@@ -1,6 +1,6 @@
 {
     "name": "nestjs-clean-code",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Starter pack. If you want to create new project with NestJS",
     "repository": {
         "type": "git",
