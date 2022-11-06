@@ -8,6 +8,10 @@
         "autoGenerate": true,
         "tokenRef": "GITHUB_TOKEN"
     },
+    "npm": {
+        "publish": false,
+        "skipChecks": true
+    },
     "plugins": {
         "@release-it/conventional-changelog": {
             "infile": "CHANGELOG.md",
