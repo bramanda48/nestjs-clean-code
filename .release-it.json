@@ -1,10 +1,15 @@
 {
+    "hooks": {
+        "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}."
+    },
     "git": {
-        "commitMessage": "build: release v${version}"
+        "commitMessage": "build: release v${version}",
+        "requireCommits": true
     },
     "github": {
         "release": true,
         "releaseName": "Release ${version}",
+        "releaseNotes": null,
         "autoGenerate": true,
         "tokenRef": "GITHUB_TOKEN"
     },
@@ -15,6 +20,7 @@
     "plugins": {
         "@release-it/conventional-changelog": {
             "infile": "CHANGELOG.md",
+            "header": "# Changelog",
             "preset": {
                 "name": "conventionalcommits",
                 "types": [

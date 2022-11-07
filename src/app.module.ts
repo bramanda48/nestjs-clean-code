@@ -17,4 +17,4 @@ import { UseCaseProxyModule } from './usecases/usecase-proxy.module';
     controllers: [AppController],
     providers: [],
 })
-export class AppModule {}
+export class AppModule { }

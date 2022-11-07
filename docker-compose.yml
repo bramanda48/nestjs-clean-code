@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  api: 
+    container_name: api
+    image: bramanda48/nestjs-clean-code:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - nestjs-network
+    ports:
+      - '3000:3000'
+    env_file: 
+      - .env
+    depends_on: 
+      - mysql80
+      
+  mysql80:
+    container_name: mysql
+    image: mysql:8.0
+    restart: always
+    networks:
+      - nestjs-network
+    ports:
+      - '3306:3306'
+    volumes:
+      - 'mysql80-data:/var/lib/mysql'
+    environment:
+      - MYSQL_DATABASE=clean-code
+      - MYSQL_ROOT_PASSWORD=nestjs
+
+volumes:
+  mysql80-data:
+    name: mysql80-data
+    driver: local
+
+networks:
+  nestjs-network:
+    name: nestjs-network
+    driver: bridge
