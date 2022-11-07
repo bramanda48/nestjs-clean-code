@@ -20,4 +20,4 @@ import { validate } from './environment.validation';
     providers: [EnvService],
     exports: [EnvService],
 })
-export class EnvModule { }
+export class EnvModule {}

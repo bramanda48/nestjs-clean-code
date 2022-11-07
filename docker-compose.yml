@@ -11,8 +11,8 @@ services:
       - nestjs-network
     ports:
       - '3000:3000'
-    env_file: 
-      - .env
+    env_file:
+      - .env.example
     depends_on: 
       - mysql80
       
