@@ -10,11 +10,11 @@ ENV BRANCH_COMMIT_MESSAGE=$BRANCH_COMMIT_MESSAGE
 USER node
 WORKDIR /home/node
 
-COPY --chown=node:node /home/node/package*.json ./
-COPY --chown=node:node /home/node/tsconfig*.json ./
-COPY --chown=node:node /home/node/nest-cli.json ./
-COPY --chown=node:node /home/node/yarn.lock ./
-COPY --chown=node:node /home/node/node_modules/ ./node_modules/
-COPY --chown=node:node /home/node/dist/ ./dist/
+COPY --chown=node:node ./package*.json ./
+COPY --chown=node:node ./tsconfig*.json ./
+COPY --chown=node:node ./nest-cli.json ./
+COPY --chown=node:node ./yarn.lock ./
+COPY --chown=node:node ./node_modules/ ./node_modules/
+COPY --chown=node:node ./dist/ ./dist/
 
 CMD ["node", "dist/main.js"]
