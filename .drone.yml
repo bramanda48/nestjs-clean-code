@@ -37,8 +37,8 @@ steps:
     image: docker:dind
     commands:
       - docker images
-      - docker login -u $DOCKER_REGISTRY_USERNAME -p $DOCKER_REGISTRY_PASSWORD ghcr.io
-      - docker push bramanda48/nestjs-clean-code:$DRONE_SOURCE_BRANCH
+      - echo $DOCKER_REGISTRY_PASSWORD | docker login -u $DOCKER_REGISTRY_USERNAME --password-stdin ghcr.io
+      - docker push ghcr.io/bramanda48/nestjs-clean-code:$DRONE_SOURCE_BRANCH
     volumes:
       - name: dockersock
         path: /var/run
@@ -53,11 +53,12 @@ steps:
     commands:
       - export BUILD_VERSION="$(awk '/version/{gsub(/("|",)/,"",$2);print $2}' package.json)";
       - docker images
-      - docker login -u $DOCKER_REGISTRY_USERNAME -p $DOCKER_REGISTRY_PASSWORD ghcr.io
-      - docker tag bramanda48/nestjs-clean-code:master "bramanda48/nestjs-clean-code:latest"
-      - docker tag bramanda48/nestjs-clean-code:master "bramanda48/nestjs-clean-code:$BUILD_VERSION"
-      - docker push "bramanda48/nestjs-clean-code:latest"
-      - docker push "bramanda48/nestjs-clean-code:$BUILD_VERSION"
+      - echo $DOCKER_REGISTRY_PASSWORD | docker login -u $DOCKER_REGISTRY_USERNAME --password-stdin ghcr.io
+      - docker tag ghcr.io/bramanda48/nestjs-clean-code:master "ghcr.io/bramanda48/nestjs-clean-code:latest"
+      - docker tag ghcr.io/bramanda48/nestjs-clean-code:master "ghcr.io/bramanda48/nestjs-clean-code:$BUILD_VERSION"
+      - docker images
+      - docker push "ghcr.io/bramanda48/nestjs-clean-code:latest"
+      - docker push "ghcr.io/bramanda48/nestjs-clean-code:$BUILD_VERSION"
     volumes:
       - name: dockersock
         path: /var/run
