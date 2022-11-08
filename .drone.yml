@@ -22,7 +22,7 @@ steps:
       - export BUILD_VERSION="$(awk '/version/{gsub(/("|",)/,"",$2);print $2}' package.json)";
       - docker build
         -f Dockerfile.droneci
-        -t "bramanda48/nestjs-clean-code:$DRONE_SOURCE_BRANCH"
+        -t "ghcr.io/bramanda48/nestjs-clean-code:$DRONE_SOURCE_BRANCH"
         --build-arg BUILD_AT="$BUILD_AT"
         --build-arg BUILD_VERSION="$BUILD_VERSION"
         --build-arg BRANCH_NAME="$DRONE_SOURCE_BRANCH"
