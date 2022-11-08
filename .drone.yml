@@ -3,6 +3,10 @@ kind: pipeline
 type: docker
 name: build-image
 
+environment:
+  REPOSITORY_URL: "https://github.com/bramanda48/nestjs-clean-code"
+  IMAGE_NAME: "ghcr.io/bramanda48/nestjs-clean-code"
+
 steps:
   - name: build apps
     image: node:16-alpine
@@ -22,7 +26,8 @@ steps:
       - export BUILD_VERSION="$(awk '/version/{gsub(/("|",)/,"",$2);print $2}' package.json)";
       - docker build
         -f Dockerfile.droneci
-        -t "ghcr.io/bramanda48/nestjs-clean-code:$DRONE_SOURCE_BRANCH"
+        -t "$IMAGE_NAME:$DRONE_SOURCE_BRANCH"
+        --build-arg REPOSITORY_URL="$REPOSITORY_URL"
         --build-arg BUILD_AT="$BUILD_AT"
         --build-arg BUILD_VERSION="$BUILD_VERSION"
         --build-arg BRANCH_NAME="$DRONE_SOURCE_BRANCH"
@@ -38,7 +43,7 @@ steps:
     commands:
       - docker images
       - echo $DOCKER_REGISTRY_PASSWORD | docker login -u $DOCKER_REGISTRY_USERNAME --password-stdin ghcr.io
-      - docker push ghcr.io/bramanda48/nestjs-clean-code:$DRONE_SOURCE_BRANCH
+      - docker push "$IMAGE_NAME:$DRONE_SOURCE_BRANCH"
     volumes:
       - name: dockersock
         path: /var/run
@@ -54,11 +59,11 @@ steps:
       - export BUILD_VERSION="$(awk '/version/{gsub(/("|",)/,"",$2);print $2}' package.json)";
       - docker images
       - echo $DOCKER_REGISTRY_PASSWORD | docker login -u $DOCKER_REGISTRY_USERNAME --password-stdin ghcr.io
-      - docker tag ghcr.io/bramanda48/nestjs-clean-code:master "ghcr.io/bramanda48/nestjs-clean-code:latest"
-      - docker tag ghcr.io/bramanda48/nestjs-clean-code:master "ghcr.io/bramanda48/nestjs-clean-code:$BUILD_VERSION"
+      - docker tag "$IMAGE_NAME:master" "$IMAGE_NAME:latest"
+      - docker tag "$IMAGE_NAME:master" "$IMAGE_NAME:$BUILD_VERSION"
       - docker images
-      - docker push "ghcr.io/bramanda48/nestjs-clean-code:latest"
-      - docker push "ghcr.io/bramanda48/nestjs-clean-code:$BUILD_VERSION"
+      - docker push "$IMAGE_NAME:latest"
+      - docker push "$IMAGE_NAME:$BUILD_VERSION"
     volumes:
       - name: dockersock
         path: /var/run

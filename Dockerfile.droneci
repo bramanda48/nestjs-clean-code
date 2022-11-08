@@ -1,5 +1,8 @@
 FROM node:16-alpine
 
+LABEL org.opencontainers.image.source $REPOSITORY_URL
+LABEL org.opencontainers.image.version $BUILD_VERSION
+
 ENV NODE_ENV=production
 ENV BUILD_AT=$BUILD_AT
 ENV BUILD_VERSION=$BUILD_VERSION
