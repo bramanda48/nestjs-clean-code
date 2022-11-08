@@ -34,7 +34,7 @@ RUN yarn run build
 
 FROM node:16-alpine
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 USER root
 RUN apk update \

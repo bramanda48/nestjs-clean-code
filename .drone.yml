@@ -1,0 +1,74 @@
+---
+kind: pipeline
+type: docker
+name: build-image
+
+steps:
+  - name: build apps
+    image: node:16-alpine
+    commands:
+      - yarn install
+      - yarn build
+  - name: run testing
+    image: node:16-alpine
+    commands:
+      - yarn test
+  - name: build docker image
+    image: docker:dind
+    commands:
+      - export BUILD_AT="$(TZ=":Asia/Jakarta" date '+%Y-%m-%dT%H:%M:%S') (GMT+7)";
+      - export BUILD_VERSION="$(node -p "require('./package.json').version")";
+      - docker build \
+        --build-arg BUILD_AT=$BUILD_AT \
+        --build-arg BUILD_VERSION=$BUILD_VERSION \
+        --build-arg BRANCH_NAME=$DRONE_SOURCE_BRANCH \
+        --build-arg BRANCH_COMMIT_SHA=$DRONE_COMMIT_SHA \
+        --build-arg BRANCH_COMMIT_MESSAGE=$DRONE_COMMIT_MESSAGE \
+        -f Dockerfile.droneci
+        -t bramanda48/nestjs-clean-code:$DRONE_SOURCE_BRANCH
+      - docker images
+  - name: login and upload image to ghcr.io
+    image: docker:dind
+    commands:
+      - docker images
+      - docker login -u $DOCKER_REGISTRY_USERNAME -p $DOCKER_REGISTRY_PASSWORD ghcr.io
+      - docker push bramanda48/nestjs-clean-code:$DRONE_SOURCE_BRANCH
+    environment:
+      DOCKER_REGISTRY_USERNAME:
+        from_secret: DOCKER_REGISTRY_USERNAME
+      DOCKER_REGISTRY_PASSWORD:
+        from_secret: DOCKER_REGISTRY_PASSWORD
+  - name: tagging and upload latest image for production
+    image: docker:dind
+    commands:
+      - docker images
+      - docker login -u $DOCKER_REGISTRY_USERNAME -p $DOCKER_REGISTRY_PASSWORD ghcr.io
+      - docker tag bramanda48/nestjs-clean-code:master bramanda48/nestjs-clean-code:latest
+      - docker push bramanda48/nestjs-clean-code:latest
+    environment:
+      DOCKER_REGISTRY_USERNAME:
+        from_secret: DOCKER_REGISTRY_USERNAME
+      DOCKER_REGISTRY_PASSWORD:
+        from_secret: DOCKER_REGISTRY_PASSWORD
+    when:
+      branch:
+        - master
+
+services:
+  - name: docker
+    image: docker:dind
+    privileged: true
+    volumes:
+      - name: dockersock
+        path: /var/run
+
+volumes:
+  - name: dockersock
+    temp: {}
+
+trigger:
+  branch:
+    - development
+    - staging
+    - hotfix
+    - master
