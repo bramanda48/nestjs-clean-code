@@ -11,7 +11,7 @@ steps:
   - name: build apps
     image: node:16-alpine
     commands:
-      - echo "BRANCH SOURCE:\ $DRONE_SOURCE_BRANCH\nBRANCH TARGET:\ $DRONE_TARGET_BRANCH";
+      - 'echo -e "+ BRANCH SOURCE: $DRONE_SOURCE_BRANCH\n+ BRANCH TARGET: $DRONE_TARGET_BRANCH";'
       - yarn install
       - yarn build
     when:
@@ -31,7 +31,7 @@ steps:
   - name: build docker image
     image: docker:dind
     commands:
-      - echo "BRANCH SOURCE:\ $DRONE_SOURCE_BRANCH\nBRANCH TARGET:\ $DRONE_TARGET_BRANCH";
+      - 'echo -e "+ BRANCH SOURCE: $DRONE_SOURCE_BRANCH\n+ BRANCH TARGET: $DRONE_TARGET_BRANCH";'
       - export BUILD_AT="$(TZ=":Asia/Jakarta" date '+%Y-%m-%dT%H:%M:%S') (GMT+7)";
       - export BUILD_VERSION="$(awk '/version/{gsub(/("|",)/,"",$2);print $2}' package.json)";
       - docker build
@@ -110,7 +110,7 @@ steps:
   - name: create new tags and upload image to ghcr.io
     image: docker:dind
     commands:
-      - echo "BRANCH SOURCE:\ $DRONE_SOURCE_BRANCH\nBRANCH TARGET:\ $DRONE_TARGET_BRANCH";
+      - 'echo -e "+ BRANCH SOURCE: $DRONE_SOURCE_BRANCH\n+ BRANCH TARGET: $DRONE_TARGET_BRANCH";'
       - sleep 5
       - export BUILD_VERSION="$(awk '/version/{gsub(/("|",)/,"",$2);print $2}' package.json)";
       - echo $DOCKER_REGISTRY_PASSWORD | docker login -u $DOCKER_REGISTRY_USERNAME --password-stdin ghcr.io
