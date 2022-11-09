@@ -1,7 +1,27 @@
+# This workflow uses 6 types of branches and
+# each branch represents the environments in development lifecycle. Those branches are:
+# 1. master/main
+#    - Production branch
+# 2. hotfix
+#    - Testing phase branch for post-released features
+# 3. staging
+#    - Testing phase branch for pre-released features
+# 4. develop
+#    - Development branch
+# 5. feature/#{ISSUE_NUMBER}_short_description
+#    - Development branch but per feature and this branch will be merge to develop branch
+# 6. fix/#{ISSUE_NUMBER}_short_description
+#    - Fixing branch
+
+#######################################
+# Source Branch -> Target Branch
+# 1. feature/*  -> develop
+# 2. fix/*      -> develop
+#######################################
 ---
 kind: pipeline
 type: docker
-name: build-image
+name: build-apps
 
 environment:
   REPOSITORY_URL: "https://github.com/bramanda48/nestjs-clean-code"
@@ -11,59 +31,58 @@ steps:
   - name: build apps
     image: node:16-alpine
     commands:
+      - echo "BRANCH SOURCE:\ $DRONE_SOURCE_BRANCH\nBRANCH TARGET:\ $DRONE_TARGET_BRANCH";
       - yarn install
       - yarn build
+    when:
+      event:
+        - push
+        - pull_request
 
   - name: run testing
     image: node:16-alpine
     commands:
       - yarn test
+    when:
+      event:
+        - push
+        - pull_request
 
   - name: build docker image
     image: docker:dind
     commands:
+      - echo "BRANCH SOURCE:\ $DRONE_SOURCE_BRANCH\nBRANCH TARGET:\ $DRONE_TARGET_BRANCH";
       - export BUILD_AT="$(TZ=":Asia/Jakarta" date '+%Y-%m-%dT%H:%M:%S') (GMT+7)";
       - export BUILD_VERSION="$(awk '/version/{gsub(/("|",)/,"",$2);print $2}' package.json)";
       - docker build
         -f Dockerfile.droneci
-        -t "$IMAGE_NAME:$DRONE_SOURCE_BRANCH"
+        -t "$IMAGE_NAME:$DRONE_TARGET_BRANCH"
         --build-arg REPOSITORY_URL="$REPOSITORY_URL"
         --build-arg BUILD_AT="$BUILD_AT"
         --build-arg BUILD_VERSION="$BUILD_VERSION"
-        --build-arg BRANCH_NAME="$DRONE_SOURCE_BRANCH"
+        --build-arg BUILD_NUMBER="$DRONE_BUILD_NUMBER"
+        --build-arg BRANCH_NAME="$DRONE_TARGET_BRANCH"
         --build-arg BRANCH_COMMIT_SHA="$DRONE_COMMIT_SHA"
         --build-arg BRANCH_COMMIT_MESSAGE="$DRONE_COMMIT_MESSAGE" .
+      - docker tag "$IMAGE_NAME:$DRONE_TARGET_BRANCH" "$IMAGE_NAME:$BUILD_VERSION-build.$DRONE_BUILD_NUMBER"
       - docker images
     volumes:
       - name: dockersock
         path: /var/run
+    when:
+      event:
+        - push
+      branch:
+        exclude:
+          - feature/*
+          - fix/*
 
   - name: login and upload image to ghcr.io
     image: docker:dind
     commands:
       - docker images
       - echo $DOCKER_REGISTRY_PASSWORD | docker login -u $DOCKER_REGISTRY_USERNAME --password-stdin ghcr.io
-      - docker push "$IMAGE_NAME:$DRONE_SOURCE_BRANCH"
-    volumes:
-      - name: dockersock
-        path: /var/run
-    environment:
-      DOCKER_REGISTRY_USERNAME:
-        from_secret: DOCKER_REGISTRY_USERNAME
-      DOCKER_REGISTRY_PASSWORD:
-        from_secret: DOCKER_REGISTRY_PASSWORD
-
-  - name: tagging and upload latest image for production server
-    image: docker:dind
-    commands:
-      - export BUILD_VERSION="$(awk '/version/{gsub(/("|",)/,"",$2);print $2}' package.json)";
-      - docker images
-      - echo $DOCKER_REGISTRY_PASSWORD | docker login -u $DOCKER_REGISTRY_USERNAME --password-stdin ghcr.io
-      - docker tag "$IMAGE_NAME:master" "$IMAGE_NAME:latest"
-      - docker tag "$IMAGE_NAME:master" "$IMAGE_NAME:$BUILD_VERSION"
-      - docker images
-      - docker push "$IMAGE_NAME:latest"
-      - docker push "$IMAGE_NAME:$BUILD_VERSION"
+      - docker push --all-tags "$IMAGE_NAME"
     volumes:
       - name: dockersock
         path: /var/run
@@ -73,8 +92,12 @@ steps:
       DOCKER_REGISTRY_PASSWORD:
         from_secret: DOCKER_REGISTRY_PASSWORD
     when:
+      event:
+        - push
       branch:
-        - master
+        exclude:
+          - feature/*
+          - fix/*
 
 services:
   - name: docker
@@ -90,7 +113,63 @@ volumes:
 
 trigger:
   branch:
-    - development
-    - staging
-    - hotfix
-    - master
+    - develop
+    - feature/*
+    - fix/*
+
+#######################################
+# Source Branch -> Target Branch
+# 1. develop    -> staging
+# 2. staging    -> master
+# 3. hotfix     -> master
+#######################################
+---
+kind: pipeline
+type: docker
+name: promote
+
+environment:
+  REPOSITORY_URL: "https://github.com/bramanda48/nestjs-clean-code"
+  IMAGE_NAME: "ghcr.io/bramanda48/nestjs-clean-code"
+
+steps:
+  - name: create new tags and upload image to ghcr.io
+    image: docker:dind
+    commands:
+      - echo "BRANCH SOURCE:\ $DRONE_SOURCE_BRANCH\nBRANCH TARGET:\ $DRONE_TARGET_BRANCH";
+      - sleep 5
+      - export BUILD_VERSION="$(awk '/version/{gsub(/("|",)/,"",$2);print $2}' package.json)";
+      - echo $DOCKER_REGISTRY_PASSWORD | docker login -u $DOCKER_REGISTRY_USERNAME --password-stdin ghcr.io
+      - docker pull "$IMAGE_NAME:$DRONE_SOURCE_BRANCH"
+      - docker tag  "$IMAGE_NAME:$DRONE_SOURCE_BRANCH" "$IMAGE_NAME:$DRONE_TARGET_BRANCH"
+      - docker tag  "$IMAGE_NAME:$DRONE_SOURCE_BRANCH" "$IMAGE_NAME:$BUILD_VERSION-build.$DRONE_BUILD_NUMBER"
+      - docker images
+      - docker push "$IMAGE_NAME:$DRONE_TARGET_BRANCH"
+      - docker push "$IMAGE_NAME:$BUILD_VERSION-build.$DRONE_BUILD_NUMBER"
+    volumes:
+      - name: dockersock
+        path: /var/run
+    environment:
+      DOCKER_REGISTRY_USERNAME:
+        from_secret: DOCKER_REGISTRY_USERNAME
+      DOCKER_REGISTRY_PASSWORD:
+        from_secret: DOCKER_REGISTRY_PASSWORD
+    when:
+      event:
+        - push
+      branch:
+        - staging
+        - master
+        - main
+
+services:
+  - name: docker
+    image: docker:dind
+    privileged: true
+    volumes:
+      - name: dockersock
+        path: /var/run
+
+volumes:
+  - name: dockersock
+    temp: {}
