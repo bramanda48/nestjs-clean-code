@@ -4,7 +4,6 @@ type: docker
 name: build-apps
 
 environment:
-  REPOSITORY_URL: "https://github.com/bramanda48/nestjs-clean-code"
   IMAGE_NAME: "ghcr.io/bramanda48/nestjs-clean-code"
 
 steps:
@@ -16,7 +15,6 @@ steps:
       - yarn build
     when:
       event:
-        - push
         - pull_request
 
   - name: run testing
@@ -25,7 +23,6 @@ steps:
       - yarn test
     when:
       event:
-        - push
         - pull_request
 
   - name: build docker image
@@ -37,7 +34,7 @@ steps:
       - docker build
         -f Dockerfile.droneci
         -t "$IMAGE_NAME:$DRONE_TARGET_BRANCH"
-        --build-arg REPOSITORY_URL="$REPOSITORY_URL"
+        --build-arg REPOSITORY_URL="$DRONE_REPO_LINK"
         --build-arg BUILD_AT="$BUILD_AT"
         --build-arg BUILD_VERSION="$BUILD_VERSION"
         --build-arg BUILD_NUMBER="$DRONE_BUILD_NUMBER"
@@ -100,10 +97,9 @@ trigger:
 ---
 kind: pipeline
 type: docker
-name: promote
+name: promote-image
 
 environment:
-  REPOSITORY_URL: "https://github.com/bramanda48/nestjs-clean-code"
   IMAGE_NAME: "ghcr.io/bramanda48/nestjs-clean-code"
 
 steps:
@@ -128,13 +124,6 @@ steps:
         from_secret: DOCKER_REGISTRY_USERNAME
       DOCKER_REGISTRY_PASSWORD:
         from_secret: DOCKER_REGISTRY_PASSWORD
-    when:
-      event:
-        - push
-      branch:
-        - staging
-        - master
-        - main
 
 services:
   - name: docker
@@ -149,6 +138,74 @@ volumes:
     temp: {}
 
 trigger:
+  event:
+    - push
+  branch:
+    - staging
+    - master
+    - main
+
+---
+kind: pipeline
+type: docker
+name: deploy-apps
+
+environment:
+  IMAGE_NAME: "ghcr.io/bramanda48/nestjs-clean-code"
+
+steps:
+  - name: get requested image
+    image: docker:dind
+    commands:
+      - export IMAGE_TAG=echo $([[ ! -z "$DRONE_BUILD_PARENT" ]] && echo "$DRONE_SOURCE_BRANCH-build.$DRONE_BUILD_PARENT" || echo "$DRONE_SOURCE_BRANCH")
+      - echo $DOCKER_REGISTRY_PASSWORD | docker login -u $DOCKER_REGISTRY_USERNAME --password-stdin ghcr.io
+      - docker pull "$IMAGE_NAME:$IMAGE_TAG"
+      - docker images
+
+  - name: deploying app to production server
+    image: docker:dind
+    commands:
+      - 'echo "TARGET ENVIRONMENT: $DRONE_DEPLOY_TO"'
+    when:
+      event:
+        - push
+        - promote
+      target:
+        - production
+      branch:
+        - master
+        - main
+
+  - name: deploying app to staging server
+    image: docker:dind
+    commands:
+      - 'echo "TARGET ENVIRONMENT: $DRONE_DEPLOY_TO"'
+    when:
+      event:
+        - push
+        - promote
+      target:
+        - staging
+      branch:
+        - staging
+
+  - name: deploying app to development server
+    image: docker:dind
+    commands:
+      - 'echo "TARGET ENVIRONMENT: $DRONE_DEPLOY_TO"'
+    when:
+      event:
+        - push
+        - promote
+      target:
+        - development
+      branch:
+        - develop
+
+trigger:
+  event:
+    - push
+    - promote
   branch:
     - staging
     - master
