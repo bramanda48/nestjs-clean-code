@@ -147,3 +147,9 @@ services:
 volumes:
   - name: dockersock
     temp: {}
+
+trigger:
+  branch:
+    - staging
+    - master
+    - main
