@@ -49,10 +49,6 @@ steps:
     when:
       event:
         - push
-      branch:
-        exclude:
-          - feature/*
-          - fix/*
 
   - name: login and upload image to ghcr.io
     image: docker:dind
@@ -71,10 +67,6 @@ steps:
     when:
       event:
         - push
-      branch:
-        exclude:
-          - feature/*
-          - fix/*
 
 services:
   - name: docker
@@ -91,8 +83,6 @@ volumes:
 trigger:
   branch:
     - develop
-    - feature/*
-    - fix/*
 
 ---
 kind: pipeline
