@@ -149,12 +149,12 @@ steps:
   - name: get requested image
     image: docker:dind
     commands:
-      - export IMAGE_TAG=echo $([[ ! -z "$DRONE_BUILD_PARENT" ]] && echo "$DRONE_SOURCE_BRANCH-build.$DRONE_BUILD_PARENT" || echo "$DRONE_SOURCE_BRANCH")
+      - export IMAGE_TAG="$([[ ! -z "$DRONE_BUILD_PARENT" ]] && echo "$DRONE_SOURCE_BRANCH-build.$DRONE_BUILD_PARENT" || echo "$DRONE_SOURCE_BRANCH")";
       - echo $DOCKER_REGISTRY_PASSWORD | docker login -u $DOCKER_REGISTRY_USERNAME --password-stdin ghcr.io
       - docker pull "$IMAGE_NAME:$IMAGE_TAG"
       - docker images
 
-  - name: deploying app to production server
+  - name: deploying apps to production server
     image: docker:dind
     commands:
       - 'echo "TARGET ENVIRONMENT: $DRONE_DEPLOY_TO"'
@@ -168,7 +168,7 @@ steps:
         - master
         - main
 
-  - name: deploying app to staging server
+  - name: deploying apps to staging server
     image: docker:dind
     commands:
       - 'echo "TARGET ENVIRONMENT: $DRONE_DEPLOY_TO"'
@@ -181,7 +181,7 @@ steps:
       branch:
         - staging
 
-  - name: deploying app to development server
+  - name: deploying apps to development server
     image: docker:dind
     commands:
       - 'echo "TARGET ENVIRONMENT: $DRONE_DEPLOY_TO"'
