@@ -176,13 +176,12 @@ steps:
   - name: deploying apps to production server
     image: docker:dind
     commands:
-      - 'echo "TARGET ENVIRONMENT: $DRONE_DEPLOY_TO"'
+      - 'echo -e "TARGET ENVIRONMENT: $DRONE_DEPLOY_TO\nBRANCH SOURCE: $DRONE_SOURCE_BRANCH"'
+      - ls -al
     when:
       event:
         - push
         - promote
-      target:
-        - production
       branch:
         - master
         - main
@@ -190,26 +189,24 @@ steps:
   - name: deploying apps to staging server
     image: docker:dind
     commands:
-      - 'echo "TARGET ENVIRONMENT: $DRONE_DEPLOY_TO"'
+      - 'echo -e "TARGET ENVIRONMENT: $DRONE_DEPLOY_TO\nBRANCH SOURCE: $DRONE_SOURCE_BRANCH"'
+      - ls -al
     when:
       event:
         - push
         - promote
-      target:
-        - staging
       branch:
         - staging
 
   - name: deploying apps to development server
     image: docker:dind
     commands:
-      - 'echo "TARGET ENVIRONMENT: $DRONE_DEPLOY_TO"'
+      - 'echo -e "TARGET ENVIRONMENT: $DRONE_DEPLOY_TO\nBRANCH SOURCE: $DRONE_SOURCE_BRANCH"'
+      - ls -al
     when:
       event:
         - push
         - promote
-      target:
-        - development
       branch:
         - develop
 
