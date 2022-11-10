@@ -11,10 +11,8 @@
 <h3 align="center">NestJS Clean Code</h3>
 
   <p align="center">
-    🏁 Starter pack. If you want to create new project with NestJS 🎉
-    <br />
-    <br />
-    <a href="https://drone.malang.dev/bramanda48/nestjs-clean-code" target="_blank"><img src="https://drone.malang.dev/api/badges/bramanda48/nestjs-clean-code/status.svg?ref=refs/heads/master" alt="Drone By Harness" /></a>
+    <h4 align="center">🏁 Starter pack. If you want to create new project with NestJS 🎉</h4>
+    <a href="https://drone.malang.dev/bramanda48/nestjs-clean-code" target="_blank" style="margin-top:10px;"><img src="https://drone.malang.dev/api/badges/bramanda48/nestjs-clean-code/status.svg?ref=refs/heads/master" alt="Drone By Harness" /></a>
     <img alt="GitHub" src="https://img.shields.io/github/license/bramanda48/nestjs-clean-code">
     <img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/bramanda48/nestjs-clean-code">
     <br />
@@ -42,7 +40,7 @@
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
-    <li><a href="#references">References</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
 
@@ -103,9 +101,9 @@ This is an example of how to list things you need to use the software and how to
     - [ ] Unit testing
     - [ ] E2E testing
     - [ ] Code Coverage
-- [x] Add CI/CD
+- [ ] Add CI/CD
     - [x] Add drone and make initial configuration
-    - [x] Multi stage deployments 
+    - [ ] Multi stage deployments 
 
 See the [open issues](https://github.com/bramanda48/nestjs-clean-code/issues) for a full list of proposed features (and known issues).
 
@@ -134,14 +132,14 @@ Don't forget to give the project a star! Thanks again!
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
+Distributed under the MIT License. See `LICENSE` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
-<!-- REFERENCES -->
-## References
+<!-- ACKNOWLEDGMENTS -->
+## Acknowledgments
 
 * [The Clean Code Blog by Uncle Bob](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 * [Clean architecture with Nestjs by @jonathan.pretre91](https://medium.com/@jonathan.pretre91/clean-architecture-with-nestjs-e089cef65045)
