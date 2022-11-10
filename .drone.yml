@@ -98,7 +98,7 @@ steps:
   - name: create new docker tags and upload it
     image: docker:dind
     commands:
-      - sleep 5
+      - sleep 15
       - 'echo -e "+ BRANCH SOURCE: $DRONE_SOURCE_BRANCH\n+ BRANCH TARGET: $DRONE_TARGET_BRANCH";'
       - export BUILD_VERSION="$(awk '/version/{gsub(/("|",)/,"",$2);print $2}' package.json)";
       - echo $DOCKER_REGISTRY_PASSWORD | docker login -u $DOCKER_REGISTRY_USERNAME --password-stdin ghcr.io
@@ -158,7 +158,7 @@ steps:
   - name: get requested image
     image: docker:dind
     commands:
-      - sleep 5
+      - sleep 15
       - export BUILD_VERSION="$(awk '/version/{gsub(/("|",)/,"",$2);print $2}' package.json)";
       - export IMAGE_TAG="$([[ ! -z "$DRONE_BUILD_PARENT" && "$DRONE_BUILD_PARENT" -gt 0 ]] && echo "$BUILD_VERSION-build.$DRONE_BUILD_PARENT" || echo "$DRONE_SOURCE_BRANCH")";
       - echo $DOCKER_REGISTRY_PASSWORD | docker login -u $DOCKER_REGISTRY_USERNAME --password-stdin ghcr.io
