@@ -40,7 +40,7 @@
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
+    <li><a href="#references">References</a></li>
   </ol>
 </details>
 
@@ -138,8 +138,8 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 
 
-<!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
+<!-- REFERENCES -->
+## References
 
 * [The Clean Code Blog by Uncle Bob](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 * [Clean architecture with Nestjs by @jonathan.pretre91](https://medium.com/@jonathan.pretre91/clean-architecture-with-nestjs-e089cef65045)
