@@ -158,10 +158,14 @@ steps:
   - name: get requested image
     image: docker:dind
     commands:
+      - sleep 5
       - export IMAGE_TAG="$([[ ! -z "$DRONE_BUILD_PARENT" ]] && echo "$DRONE_SOURCE_BRANCH-build.$DRONE_BUILD_PARENT" || echo "$DRONE_SOURCE_BRANCH")";
       - echo $DOCKER_REGISTRY_PASSWORD | docker login -u $DOCKER_REGISTRY_USERNAME --password-stdin ghcr.io
       - docker pull "$IMAGE_NAME:$IMAGE_TAG"
       - docker images
+    volumes:
+      - name: dockersock
+        path: /var/run
     environment:
       DOCKER_REGISTRY_USERNAME:
         from_secret: DOCKER_REGISTRY_USERNAME
@@ -207,6 +211,18 @@ steps:
         - development
       branch:
         - develop
+
+services:
+  - name: docker
+    image: docker:dind
+    privileged: true
+    volumes:
+      - name: dockersock
+        path: /var/run
+
+volumes:
+  - name: dockersock
+    temp: {}
 
 trigger:
   event:
