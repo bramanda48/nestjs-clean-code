@@ -95,7 +95,7 @@ environment:
   IMAGE_NAME: "ghcr.io/bramanda48/nestjs-clean-code"
 
 steps:
-  - name: create new tags and upload image to ghcr.io
+  - name: create new docker tags and upload it
     image: docker:dind
     commands:
       - 'echo -e "+ BRANCH SOURCE: $DRONE_SOURCE_BRANCH\n+ BRANCH TARGET: $DRONE_TARGET_BRANCH";'
@@ -116,6 +116,15 @@ steps:
         from_secret: DOCKER_REGISTRY_USERNAME
       DOCKER_REGISTRY_PASSWORD:
         from_secret: DOCKER_REGISTRY_PASSWORD
+
+  - name: relase new version in repository
+    image: docker:dind
+    commands:
+      - echo "";
+    when:
+      branch:
+        - master
+        - main
 
 services:
   - name: docker
@@ -153,6 +162,11 @@ steps:
       - echo $DOCKER_REGISTRY_PASSWORD | docker login -u $DOCKER_REGISTRY_USERNAME --password-stdin ghcr.io
       - docker pull "$IMAGE_NAME:$IMAGE_TAG"
       - docker images
+    environment:
+      DOCKER_REGISTRY_USERNAME:
+        from_secret: DOCKER_REGISTRY_USERNAME
+      DOCKER_REGISTRY_PASSWORD:
+        from_secret: DOCKER_REGISTRY_PASSWORD
 
   - name: deploying apps to production server
     image: docker:dind
