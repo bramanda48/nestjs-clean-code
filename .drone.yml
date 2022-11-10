@@ -4,14 +4,13 @@ type: docker
 name: build-apps
 
 environment:
-  REPOSITORY_URL: "https://github.com/bramanda48/nestjs-clean-code"
   IMAGE_NAME: "ghcr.io/bramanda48/nestjs-clean-code"
 
 steps:
   - name: build apps
     image: node:16-alpine
     commands:
-      - echo "BRANCH SOURCE:\ $DRONE_SOURCE_BRANCH\nBRANCH TARGET:\ $DRONE_TARGET_BRANCH";
+      - 'echo -e "+ BRANCH SOURCE: $DRONE_SOURCE_BRANCH\n+ BRANCH TARGET: $DRONE_TARGET_BRANCH";'
       - yarn install
       - yarn build
     when:
@@ -31,13 +30,13 @@ steps:
   - name: build docker image
     image: docker:dind
     commands:
-      - echo "BRANCH SOURCE:\ $DRONE_SOURCE_BRANCH\nBRANCH TARGET:\ $DRONE_TARGET_BRANCH";
+      - 'echo -e "+ BRANCH SOURCE: $DRONE_SOURCE_BRANCH\n+ BRANCH TARGET: $DRONE_TARGET_BRANCH";'
       - export BUILD_AT="$(TZ=":Asia/Jakarta" date '+%Y-%m-%dT%H:%M:%S') (GMT+7)";
       - export BUILD_VERSION="$(awk '/version/{gsub(/("|",)/,"",$2);print $2}' package.json)";
       - docker build
         -f Dockerfile.droneci
         -t "$IMAGE_NAME:$DRONE_TARGET_BRANCH"
-        --build-arg REPOSITORY_URL="$REPOSITORY_URL"
+        --build-arg REPOSITORY_URL="$DRONE_REPO_LINK"
         --build-arg BUILD_AT="$BUILD_AT"
         --build-arg BUILD_VERSION="$BUILD_VERSION"
         --build-arg BUILD_NUMBER="$DRONE_BUILD_NUMBER"
@@ -52,10 +51,6 @@ steps:
     when:
       event:
         - push
-      branch:
-        exclude:
-          - feature/*
-          - fix/*
 
   - name: login and upload image to ghcr.io
     image: docker:dind
@@ -74,10 +69,6 @@ steps:
     when:
       event:
         - push
-      branch:
-        exclude:
-          - feature/*
-          - fix/*
 
 services:
   - name: docker
@@ -94,24 +85,21 @@ volumes:
 trigger:
   branch:
     - develop
-    - feature/*
-    - fix/*
 
 ---
 kind: pipeline
 type: docker
-name: promote
+name: promote-image
 
 environment:
-  REPOSITORY_URL: "https://github.com/bramanda48/nestjs-clean-code"
   IMAGE_NAME: "ghcr.io/bramanda48/nestjs-clean-code"
 
 steps:
-  - name: create new tags and upload image to ghcr.io
+  - name: create new docker tags and upload it
     image: docker:dind
     commands:
-      - echo "BRANCH SOURCE:\ $DRONE_SOURCE_BRANCH\nBRANCH TARGET:\ $DRONE_TARGET_BRANCH";
-      - sleep 5
+      - sleep 15
+      - 'echo -e "+ BRANCH SOURCE: $DRONE_SOURCE_BRANCH\n+ BRANCH TARGET: $DRONE_TARGET_BRANCH";'
       - export BUILD_VERSION="$(awk '/version/{gsub(/("|",)/,"",$2);print $2}' package.json)";
       - echo $DOCKER_REGISTRY_PASSWORD | docker login -u $DOCKER_REGISTRY_USERNAME --password-stdin ghcr.io
       - docker pull "$IMAGE_NAME:$DRONE_SOURCE_BRANCH"
@@ -128,13 +116,6 @@ steps:
         from_secret: DOCKER_REGISTRY_USERNAME
       DOCKER_REGISTRY_PASSWORD:
         from_secret: DOCKER_REGISTRY_PASSWORD
-    when:
-      event:
-        - push
-      branch:
-        - staging
-        - master
-        - main
 
 services:
   - name: docker
@@ -147,3 +128,97 @@ services:
 volumes:
   - name: dockersock
     temp: {}
+
+trigger:
+  event:
+    - push
+  branch:
+    - staging
+    - master
+    - main
+
+---
+kind: pipeline
+type: docker
+name: deploy-apps
+
+environment:
+  IMAGE_NAME: "ghcr.io/bramanda48/nestjs-clean-code"
+
+steps:
+  - name: get requested image
+    image: docker:dind
+    commands:
+      - sleep 15
+      - export BUILD_VERSION="$(awk '/version/{gsub(/("|",)/,"",$2);print $2}' package.json)";
+      - export IMAGE_TAG="$([["$DRONE_BUILD_EVENT" -eq "promote"] || ["$DRONE_BUILD_EVENT" -eq "rollback"]] && echo "$BUILD_VERSION-build.$DRONE_BUILD_PARENT" || echo "$DRONE_SOURCE_BRANCH")";
+      - echo $DOCKER_REGISTRY_PASSWORD | docker login -u $DOCKER_REGISTRY_USERNAME --password-stdin ghcr.io
+      - docker pull "$IMAGE_NAME:$IMAGE_TAG"
+      - docker images
+    volumes:
+      - name: dockersock
+        path: /var/run
+    environment:
+      DOCKER_REGISTRY_USERNAME:
+        from_secret: DOCKER_REGISTRY_USERNAME
+      DOCKER_REGISTRY_PASSWORD:
+        from_secret: DOCKER_REGISTRY_PASSWORD
+
+  - name: deploying apps to production server
+    image: docker:dind
+    commands:
+      - 'echo -e "TARGET ENVIRONMENT: production\nBRANCH SOURCE: $DRONE_SOURCE_BRANCH"'
+      - ls -al
+    when:
+      event:
+        - push
+        - promote
+      branch:
+        - master
+        - main
+
+  - name: deploying apps to staging server
+    image: docker:dind
+    commands:
+      - 'echo -e "TARGET ENVIRONMENT: staging\nBRANCH SOURCE: $DRONE_SOURCE_BRANCH"'
+      - ls -al
+    when:
+      event:
+        - push
+        - promote
+      branch:
+        - staging
+
+  - name: deploying apps to development server
+    image: docker:dind
+    commands:
+      - 'echo -e "TARGET ENVIRONMENT: development\nBRANCH SOURCE: $DRONE_SOURCE_BRANCH"'
+      - ls -al
+    when:
+      event:
+        - push
+        - promote
+      branch:
+        - develop
+
+services:
+  - name: docker
+    image: docker:dind
+    privileged: true
+    volumes:
+      - name: dockersock
+        path: /var/run
+
+volumes:
+  - name: dockersock
+    temp: {}
+
+trigger:
+  event:
+    - push
+    - promote
+  branch:
+    - develop
+    - staging
+    - master
+    - main
