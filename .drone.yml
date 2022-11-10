@@ -117,15 +117,6 @@ steps:
       DOCKER_REGISTRY_PASSWORD:
         from_secret: DOCKER_REGISTRY_PASSWORD
 
-  - name: relase new version in repository
-    image: docker:dind
-    commands:
-      - echo "";
-    when:
-      branch:
-        - master
-        - main
-
 services:
   - name: docker
     image: docker:dind
@@ -176,7 +167,7 @@ steps:
   - name: deploying apps to production server
     image: docker:dind
     commands:
-      - 'echo -e "TARGET ENVIRONMENT: $DRONE_DEPLOY_TO\nBRANCH SOURCE: $DRONE_SOURCE_BRANCH"'
+      - 'echo -e "TARGET ENVIRONMENT: production\nBRANCH SOURCE: $DRONE_SOURCE_BRANCH"'
       - ls -al
     when:
       event:
@@ -189,7 +180,7 @@ steps:
   - name: deploying apps to staging server
     image: docker:dind
     commands:
-      - 'echo -e "TARGET ENVIRONMENT: $DRONE_DEPLOY_TO\nBRANCH SOURCE: $DRONE_SOURCE_BRANCH"'
+      - 'echo -e "TARGET ENVIRONMENT: staging\nBRANCH SOURCE: $DRONE_SOURCE_BRANCH"'
       - ls -al
     when:
       event:
@@ -201,7 +192,7 @@ steps:
   - name: deploying apps to development server
     image: docker:dind
     commands:
-      - 'echo -e "TARGET ENVIRONMENT: $DRONE_DEPLOY_TO\nBRANCH SOURCE: $DRONE_SOURCE_BRANCH"'
+      - 'echo -e "TARGET ENVIRONMENT: development\nBRANCH SOURCE: $DRONE_SOURCE_BRANCH"'
       - ls -al
     when:
       event:
