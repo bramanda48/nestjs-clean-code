@@ -69,7 +69,7 @@ This is an example of how to list things you need to use the software and how to
    $ yarn install
    ```
 3. Rename `.env.example` to `.env`
-5. Build and Run the application
+5. Build and start the application
    ```sh
    # build application
    $ yarn build
@@ -101,9 +101,9 @@ This is an example of how to list things you need to use the software and how to
     - [ ] Unit testing
     - [ ] E2E testing
     - [ ] Code Coverage
-- [ ] Add CI/CD
+- [x] Add CI/CD
     - [x] Add drone and make initial configuration
-    - [ ] Multi stage deployments 
+    - [x] Multi stage deployments 
 
 See the [open issues](https://github.com/bramanda48/nestjs-clean-code/issues) for a full list of proposed features (and known issues).
 
