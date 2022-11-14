@@ -10,7 +10,6 @@ steps:
   - name: build apps
     image: node:16-alpine
     commands:
-      - 'echo -e "+ BRANCH SOURCE: $DRONE_SOURCE_BRANCH\n+ BRANCH TARGET: $DRONE_TARGET_BRANCH";'
       - yarn install
       - yarn build
     when:
@@ -30,7 +29,6 @@ steps:
   - name: build docker image
     image: docker:dind
     commands:
-      - 'echo -e "+ BRANCH SOURCE: $DRONE_SOURCE_BRANCH\n+ BRANCH TARGET: $DRONE_TARGET_BRANCH";'
       - export BUILD_AT="$(TZ=":Asia/Jakarta" date '+%Y-%m-%dT%H:%M:%S') (GMT+7)";
       - export BUILD_VERSION="$(awk '/version/{gsub(/("|",)/,"",$2);print $2}' package.json)";
       - docker build
@@ -83,142 +81,12 @@ volumes:
     temp: {}
 
 trigger:
-  branch:
-    - develop
-
----
-kind: pipeline
-type: docker
-name: promote-image
-
-environment:
-  IMAGE_NAME: "ghcr.io/bramanda48/nestjs-clean-code"
-
-steps:
-  - name: create new docker tags and upload it
-    image: docker:dind
-    commands:
-      - sleep 15
-      - 'echo -e "+ BRANCH SOURCE: $DRONE_SOURCE_BRANCH\n+ BRANCH TARGET: $DRONE_TARGET_BRANCH";'
-      - export BUILD_VERSION="$(awk '/version/{gsub(/("|",)/,"",$2);print $2}' package.json)";
-      - echo $DOCKER_REGISTRY_PASSWORD | docker login -u $DOCKER_REGISTRY_USERNAME --password-stdin ghcr.io
-      - docker pull "$IMAGE_NAME:$DRONE_SOURCE_BRANCH"
-      - docker tag  "$IMAGE_NAME:$DRONE_SOURCE_BRANCH" "$IMAGE_NAME:$DRONE_TARGET_BRANCH"
-      - docker tag  "$IMAGE_NAME:$DRONE_SOURCE_BRANCH" "$IMAGE_NAME:$BUILD_VERSION-build.$DRONE_BUILD_NUMBER"
-      - docker images
-      - docker push "$IMAGE_NAME:$DRONE_TARGET_BRANCH"
-      - docker push "$IMAGE_NAME:$BUILD_VERSION-build.$DRONE_BUILD_NUMBER"
-    volumes:
-      - name: dockersock
-        path: /var/run
-    environment:
-      DOCKER_REGISTRY_USERNAME:
-        from_secret: DOCKER_REGISTRY_USERNAME
-      DOCKER_REGISTRY_PASSWORD:
-        from_secret: DOCKER_REGISTRY_PASSWORD
-
-services:
-  - name: docker
-    image: docker:dind
-    privileged: true
-    volumes:
-      - name: dockersock
-        path: /var/run
-
-volumes:
-  - name: dockersock
-    temp: {}
-
-trigger:
   event:
-    - push
-  branch:
-    - staging
-    - master
-    - main
-
----
-kind: pipeline
-type: docker
-name: deploy-apps
-
-environment:
-  IMAGE_NAME: "ghcr.io/bramanda48/nestjs-clean-code"
-
-steps:
-  - name: get requested image
-    image: docker:dind
-    commands:
-      - sleep 15
-      - export BUILD_VERSION="$(awk '/version/{gsub(/("|",)/,"",$2);print $2}' package.json)";
-      - export IMAGE_TAG="$([["$DRONE_BUILD_EVENT" -eq "promote"] || ["$DRONE_BUILD_EVENT" -eq "rollback"]] && echo "$BUILD_VERSION-build.$DRONE_BUILD_PARENT" || echo "$DRONE_SOURCE_BRANCH")";
-      - echo $DOCKER_REGISTRY_PASSWORD | docker login -u $DOCKER_REGISTRY_USERNAME --password-stdin ghcr.io
-      - docker pull "$IMAGE_NAME:$IMAGE_TAG"
-      - docker images
-    volumes:
-      - name: dockersock
-        path: /var/run
-    environment:
-      DOCKER_REGISTRY_USERNAME:
-        from_secret: DOCKER_REGISTRY_USERNAME
-      DOCKER_REGISTRY_PASSWORD:
-        from_secret: DOCKER_REGISTRY_PASSWORD
-
-  - name: deploying apps to production server
-    image: docker:dind
-    commands:
-      - 'echo -e "TARGET ENVIRONMENT: production\nBRANCH SOURCE: $DRONE_SOURCE_BRANCH"'
-      - ls -al
-    when:
-      event:
-        - push
-        - promote
-      branch:
-        - master
-        - main
-
-  - name: deploying apps to staging server
-    image: docker:dind
-    commands:
-      - 'echo -e "TARGET ENVIRONMENT: staging\nBRANCH SOURCE: $DRONE_SOURCE_BRANCH"'
-      - ls -al
-    when:
-      event:
-        - push
-        - promote
-      branch:
-        - staging
-
-  - name: deploying apps to development server
-    image: docker:dind
-    commands:
-      - 'echo -e "TARGET ENVIRONMENT: development\nBRANCH SOURCE: $DRONE_SOURCE_BRANCH"'
-      - ls -al
-    when:
-      event:
-        - push
-        - promote
-      branch:
-        - develop
-
-services:
-  - name: docker
-    image: docker:dind
-    privileged: true
-    volumes:
-      - name: dockersock
-        path: /var/run
-
-volumes:
-  - name: dockersock
-    temp: {}
-
-trigger:
-  event:
-    - push
-    - promote
+    exclude:
+      - promote
+      - rollback
   branch:
     - develop
     - staging
-    - master
     - main
+    - master
